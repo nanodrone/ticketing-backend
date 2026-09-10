@@ -1,6 +1,10 @@
 from typing import Optional
 from sqlmodel import SQLModel
 
+from enum import Enum
+from typing import Optional
+from sqlmodel import SQLModel
+
 
 class UserCreate(SQLModel):
     name: str

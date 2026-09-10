@@ -38,3 +38,23 @@ def test_create_and_update_ticket(client):
     )
     assert patch_response.status_code == 200
     assert patch_response.json()["status"] == "closed"
+
+def test_create_ticket_with_invalid_priority(client):
+    user_response = client.post(
+        "/users/",
+        json={"name": "Luigi Bianchi", "email": "luigi@example.com"}
+    )
+    user_id = user_response.json()["id"]
+
+    response = client.post(
+        "/tickets/",
+        json={
+            "title": "Errore accesso",
+            "description": "Non riesco ad accedere al portale",
+            "priority": "urgentissimo",
+            "user_id": user_id,
+            "asset_id": None
+        }
+    )
+
+    assert response.status_code == 422

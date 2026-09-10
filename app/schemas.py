@@ -46,3 +46,8 @@ class TicketRead(SQLModel):
     priority: str
     user_id: int
     asset_id: Optional[int] = None
+
+class TicketUpdate(SQLModel):
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    description: Optional[str] = None

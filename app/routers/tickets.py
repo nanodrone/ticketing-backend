@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 from app.db import get_session
 from app.models import Ticket, User, Asset
 from app.schemas import TicketCreate, TicketRead
+from app.schemas import TicketUpdate
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
@@ -40,3 +41,18 @@ def read_ticket(ticket_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Ticket non trovato")
 
     return ticket
+
+@router.patch("/{ticket_id}", response_model=TicketRead)
+def update_ticket(ticket_id: int, ticket_update: TicketUpdate, session: Session = Depends(get_session)):
+    db_ticket = session.get(Ticket, ticket_id)
+
+    if not db_ticket:
+        raise HTTPException(status_code=404, detail="Ticket non trovato")
+
+    ticket_data = ticket_update.model_dump(exclude_unset=True)
+    db_ticket.sqlmodel_update(ticket_data)
+
+    session.add(db_ticket)
+    session.commit()
+    session.refresh(db_ticket)
+    return db_ticket

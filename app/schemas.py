@@ -5,10 +5,20 @@ from enum import Enum
 from typing import Optional
 from sqlmodel import SQLModel
 
+class TicketStatus(str, Enum):
+    open = "open"
+    in_progress = "in_progress"
+    closed = "closed"
+
+class TicketPriority(str, Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
 
 class UserCreate(SQLModel):
     name: str
     email: str
+    password: str
 
 
 class UserRead(SQLModel):
@@ -16,6 +26,12 @@ class UserRead(SQLModel):
     name: str
     email: str
 
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+class TokenData(SQLModel):
+    email: Optional[str] = None
 
 class AssetCreate(SQLModel):
     name: str
@@ -37,7 +53,7 @@ class AssetRead(SQLModel):
 class TicketCreate(SQLModel):
     title: str
     description: str
-    priority: Optional[str] = "medium"
+    priority: TicketPriority = TicketPriority.medium
     user_id: int
     asset_id: Optional[int] = None
 
@@ -46,12 +62,12 @@ class TicketRead(SQLModel):
     id: int
     title: str
     description: str
-    status: str
-    priority: str
+    status: TicketStatus
+    priority: TicketPriority
     user_id: int
     asset_id: Optional[int] = None
 
 class TicketUpdate(SQLModel):
-    status: Optional[str] = None
-    priority: Optional[str] = None
+    status: Optional[TicketStatus] = None
+    priority: Optional[TicketPriority] = None
     description: Optional[str] = None

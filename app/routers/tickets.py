@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
+from requests import session
 from sqlmodel import Session, select
 
 from app.db import get_session
+from app.security import get_current_user
 from app.models import Ticket, User, Asset
 from app.schemas import TicketCreate, TicketRead
 from app.schemas import TicketUpdate
@@ -33,14 +35,13 @@ def read_tickets(session: Session = Depends(get_session)):
     return tickets
 
 
-@router.get("/{ticket_id}", response_model=TicketRead)
-def read_ticket(ticket_id: int, session: Session = Depends(get_session)):
-    ticket = session.get(Ticket, ticket_id)
-
-    if not ticket:
-        raise HTTPException(status_code=404, detail="Ticket non trovato")
-
-    return ticket
+@router.get("/", response_model=list[TicketRead])
+def read_tickets(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    tickets = session.exec(select(Ticket)).all()
+    return tickets
 
 @router.patch("/{ticket_id}", response_model=TicketRead)
 def update_ticket(ticket_id: int, ticket_update: TicketUpdate, session: Session = Depends(get_session)):
